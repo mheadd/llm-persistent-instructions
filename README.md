@@ -180,6 +180,116 @@ curl -X POST http://localhost:3000/api/chat/business-licensing \
   -d '{"message": "I want to start a consulting business. What permits do I need?"}'
 ```
 
+## ✅ Automated Testing
+
+This project includes a comprehensive test suite to ensure reliability and catch regressions during development.
+
+### Test Categories
+
+- **🔬 Unit Tests**: Configuration loading, data validation
+- **🔗 Integration Tests**: API endpoints, request/response handling
+- **⚡ Performance Tests**: Response times, concurrent request handling
+- **🎯 End-to-End Tests**: Complete user workflows, cross-persona consistency
+
+### Running Tests
+
+#### Quick Test (Recommended)
+```bash
+# Run the complete test suite
+./test.sh
+```
+
+#### Specific Test Categories
+```bash
+# Unit tests only (fast, no Docker required)
+./test.sh unit
+
+# Integration tests (requires Docker containers)
+./test.sh integration
+
+# Performance tests
+./test.sh performance
+
+# End-to-end tests
+./test.sh e2e
+
+# Generate coverage report
+./test.sh coverage
+```
+
+#### Manual Testing (Advanced)
+```bash
+# Install test dependencies
+cd api
+npm install
+
+# Run specific test files
+npm test -- config.test.js
+npm test -- api.test.js
+npm test -- performance.test.js
+npm test -- e2e.test.js
+
+# Watch mode for development
+npm run test:watch
+
+# Coverage report
+npm run test:coverage
+```
+
+### Test Environment Setup
+
+The test suite automatically:
+1. ✅ Checks Docker availability
+2. ✅ Starts containers if needed
+3. ✅ Waits for services to be ready
+4. ✅ Installs dependencies
+5. ✅ Runs tests with mocked AI responses
+6. ✅ Generates reports
+
+### Test Features
+
+- **Mocked AI Responses**: Tests run quickly without hitting the actual LLM
+- **Realistic Scenarios**: Tests cover common government service inquiries
+- **Error Handling**: Validates graceful handling of service failures
+- **Performance Monitoring**: Ensures response times meet expectations
+- **Cross-Browser Support**: API tests work with any HTTP client
+
+### Continuous Integration
+
+For CI/CD pipelines, use:
+```bash
+# Non-interactive test run with coverage
+./test.sh coverage
+
+# Results are saved to api/coverage/ for CI reporting
+```
+
+### Test Results
+
+After running tests, you'll see:
+- ✅ **Pass/Fail Status**: Clear indication of test results
+- 📊 **Coverage Report**: Code coverage metrics
+- ⏱️ **Performance Metrics**: Response time measurements
+- 🐛 **Error Details**: Specific failure information when tests fail
+
+Example output:
+```
+🧪 Government AI Prototype - Test Suite
+========================================
+✅ Docker containers are running
+📦 Installing test dependencies...
+🔬 Running unit tests...
+   ✓ Configuration loading (4 tests)
+🔗 Running integration tests...
+   ✓ API endpoints (12 tests)
+⚡ Running performance tests...
+   ✓ Response times (6 tests)
+🎯 Running end-to-end tests...
+   ✓ User workflows (8 tests)
+📊 Coverage: 95% statements, 92% branches
+✅ Test execution completed!
+```
+
 ## 🔄 Development Workflow
 
 1. **Modify Personas**: Edit YAML files in `api/config/`
