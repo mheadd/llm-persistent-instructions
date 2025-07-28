@@ -50,8 +50,8 @@ jobs:
         echo "📊 Generating test coverage..."
         npm run test:coverage -- --testPathPattern="(config|api).test.js" --ci --silent
         
-    - name: � Upload coverage artifacts
-      uses: actions/upload-artifact@v3
+    - name: 📤 Upload coverage artifacts
+      uses: actions/upload-artifact@v4
       if: always()
       with:
         name: test-coverage

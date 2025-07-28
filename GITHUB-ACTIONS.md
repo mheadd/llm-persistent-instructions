@@ -44,7 +44,7 @@ This repository includes automated continuous integration and delivery (CI/CD) u
 
 ### 4. Coverage & Artifacts
 - **📊 Coverage Generation**: Test coverage reports
-- **📤 Artifact Upload**: Coverage reports saved for 7 days
+- **📤 Artifact Upload**: Coverage reports saved for 7 days (using `actions/upload-artifact@v4`)
 - **📋 Summary**: Job summary with test results
 
 ### 5. Pull Request Features
@@ -139,6 +139,13 @@ npm audit --audit-level=high  # Skip moderate vulnerabilities temporarily
 - Ensure they're from trusted sources
 - Update to latest secure versions
 - Document any accepted risks
+
+#### 4. GitHub Actions Deprecation Warnings
+**Problem**: Warning about deprecated actions (e.g., `actions/upload-artifact: v3`)
+**Solution**:
+- Update to latest action versions in workflow file
+- Current workflow uses `actions/upload-artifact@v4` (latest)
+- All GitHub Actions are kept up-to-date to avoid deprecation issues
 
 ### Debugging Steps
 1. **Check workflow logs**: View detailed logs in GitHub Actions
