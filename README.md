@@ -51,11 +51,11 @@ The demo includes three government service assistants:
 - Git
 - **Patience**: Initial setup takes 5-10 minutes due to model download and loading
 
-### ⏱️ Expected Timeline
+### ⏱️ Expected Timeline (Optimized)
 - **Container startup**: 30-60 seconds
 - **Model download**: 3-5 minutes (2.2GB download)
-- **First API request**: 1-2 minutes (model loading into memory)
-- **Subsequent requests**: 10-30 seconds
+- **First API request**: 30-90 seconds (model loading into memory)
+- **Subsequent requests**: 5-15 seconds (significantly improved with optimizations)
 
 ### Setup
 ```bash
@@ -63,7 +63,7 @@ The demo includes three government service assistants:
 git clone <repository-url>
 cd llm-persistent-instructions
 
-# Start all services
+# Start all services (now with optimized memory allocation)
 docker-compose up -d
 
 # Pull the Phi-3 model manually (required on first run)
@@ -72,7 +72,7 @@ docker exec ollama-service ollama pull phi3:mini
 # Wait for the model to download (2.2GB - may take several minutes)
 # Monitor the download progress in the output above
 
-# Test the API (note: first request may take 1-2 minutes)
+# Test the API (note: first request may take 30-90 seconds)
 curl -X POST http://localhost:3000/api/chat/unemployment-benefits \
   -H "Content-Type: application/json" \
   -d '{"message": "How do I apply for unemployment benefits?"}'
@@ -80,9 +80,11 @@ curl -X POST http://localhost:3000/api/chat/unemployment-benefits \
 
 ### ⚠️ Important Setup Notes
 - **First-time setup**: The Phi-3 model download is ~2.2GB and happens on first run
-- **Memory requirement**: Ensure you have at least 8GB of available RAM
-- **Initial response time**: First API requests take 1-2 minutes as the model loads into memory
-- **Subsequent requests**: Much faster once the model is loaded (typically 10-30 seconds)
+- **Memory requirement**: Ensure you have at least 10GB of available RAM (8GB for Ollama + 2GB for system)
+- **Docker memory**: Make sure Docker Desktop has sufficient memory allocated (8GB+ recommended)
+- **Initial response time**: First API requests take 30-90 seconds as the model loads into memory
+- **Model persistence**: With optimizations, the model stays in memory for 60 minutes after last use
+- **Subsequent requests**: Much faster (5-15 seconds) once the model is loaded and cached
 
 ## 📡 API Endpoints
 
