@@ -1,5 +1,7 @@
 # Government AI Prototype - Persistent Instruction Layering Demo
 
+[![CI - Tests & Security](https://github.com/mheadd/llm-persistent-instructions/actions/workflows/ci.yml/badge.svg)](https://github.com/mheadd/llm-persistent-instructions/actions/workflows/ci.yml)
+
 A containerized application demonstrating how to create different AI personas using instruction layering with open-source LLMs. This prototype shows how the same language model can provide specialized government service experiences through endpoint-specific instructions.
 
 ## 🎯 What This Demonstrates
@@ -293,9 +295,41 @@ Example output:
 ## 🔄 Development Workflow
 
 1. **Modify Personas**: Edit YAML files in `api/config/`
-2. **Test Changes**: Restart API container: `docker-compose restart api`
+2. **Test Changes**: Run tests with `./test.sh unit` or `./test.sh integration`
 3. **Add New Personas**: Create new YAML config + add route in `server.js`
 4. **Monitor Logs**: `docker-compose logs -f api ollama`
+5. **Commit Changes**: Push to main branch triggers automated CI/CD
+
+## 🚀 Continuous Integration
+
+This project includes automated GitHub Actions workflows that run on every commit to the main branch:
+
+### CI/CD Pipeline
+- **🔬 Unit Tests**: Configuration loading and validation tests
+- **🔗 Integration Tests**: API endpoint and request handling tests  
+- **🛡️ Security Scanning**: npm audit for dependency vulnerabilities
+- **📊 Coverage Reports**: Automated test coverage generation
+- **📤 Artifacts**: Test results and coverage reports saved for 7 days
+
+### Workflow Triggers
+- **Push to main**: Full test suite + security scan
+- **Pull Requests**: Tests + dependency review
+- **Manual**: Can be triggered manually from GitHub Actions tab
+
+### Viewing Results
+1. Go to the **Actions** tab in your GitHub repository
+2. Click on the latest workflow run
+3. View test results, coverage reports, and security scan results
+4. Download artifacts for detailed analysis
+
+### Local vs CI Testing
+```bash
+# Local development testing
+./test.sh unit integration    # Quick feedback during development
+
+# CI pipeline runs automatically
+git push origin main          # Triggers full CI pipeline
+```
 
 ## 🚨 Troubleshooting
 

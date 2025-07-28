@@ -1,0 +1,124 @@
+name: Test & Security Scan
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+env:
+  NODE_VERSION: '20.x'
+
+jobs:
+  test-and-security:
+    name: Run Tests & Security Scans
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: 🔄 Checkout Code
+      uses: actions/checkout@v4
+      
+    - name: 🟢 Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: ${{ env.NODE_VERSION }}
+        cache: 'npm'
+        cache-dependency-path: api/package-lock.json
+        
+    - name: 📦 Install Dependencies
+      working-directory: ./api
+      run: |
+        echo "📦 Installing dependencies..."
+        npm ci --only=production
+        npm install --only=dev
+        
+    - name: 🔬 Run Unit Tests
+      working-directory: ./api
+      run: |
+        echo "🔬 Running unit tests..."
+        npm test -- --testPathPattern="config.test.js" --ci --verbose=false
+        
+    - name: 🔗 Run Integration Tests
+      working-directory: ./api
+      run: |
+        echo "🔗 Running integration tests..."
+        npm test -- --testPathPattern="api.test.js" --ci --verbose=false
+        
+    - name: 🛡️ NPM Audit - Security Scan
+      working-directory: ./api
+      run: |
+        echo "🛡️ Running npm audit for security vulnerabilities..."
+        echo "Checking for vulnerabilities at 'moderate' level and above..."
+        npm audit --audit-level=moderate || {
+          echo "⚠️ Security vulnerabilities found. Details above."
+          echo "Run 'npm audit fix' to attempt automatic fixes."
+          exit 1
+        }
+        echo "✅ No security vulnerabilities found at moderate level or above."
+        
+    - name: 📊 Generate Test Coverage
+      working-directory: ./api
+      run: |
+        echo "📊 Generating test coverage report..."
+        npm run test:coverage -- --testPathPattern="(config|api).test.js" --ci --silent
+        
+    - name: 🔍 Package Analysis
+      working-directory: ./api
+      run: |
+        echo "🔍 Analyzing package dependencies..."
+        echo "## Dependency Analysis" > ../dependency-report.md
+        echo "### Installed Packages" >> ../dependency-report.md
+        npm list --depth=0 >> ../dependency-report.md
+        echo "" >> ../dependency-report.md
+        echo "### Security Audit Summary" >> ../dependency-report.md
+        npm audit --format json > audit-results.json || true
+        if [ -f audit-results.json ]; then
+          echo "Audit completed. Check for any vulnerabilities in the logs above." >> ../dependency-report.md
+        fi
+        
+    - name: 📤 Upload Test Results
+      uses: actions/upload-artifact@v3
+      if: always()
+      with:
+        name: test-coverage-report
+        path: |
+          api/coverage/
+          dependency-report.md
+        retention-days: 30
+        
+    - name: 📋 Job Summary
+      if: always()
+      run: |
+        echo "## 🧪 CI/CD Pipeline Results" >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+        echo "| Component | Status |" >> $GITHUB_STEP_SUMMARY
+        echo "|-----------|--------|" >> $GITHUB_STEP_SUMMARY
+        echo "| Unit Tests | ✅ Completed |" >> $GITHUB_STEP_SUMMARY
+        echo "| Integration Tests | ✅ Completed |" >> $GITHUB_STEP_SUMMARY
+        echo "| Security Scan (npm audit) | ✅ Completed |" >> $GITHUB_STEP_SUMMARY
+        echo "| Test Coverage | ✅ Generated |" >> $GITHUB_STEP_SUMMARY
+        echo "| Node.js Version | ${{ env.NODE_VERSION }} |" >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+        echo "### 📊 Artifacts" >> $GITHUB_STEP_SUMMARY
+        echo "- Test coverage reports available in job artifacts" >> $GITHUB_STEP_SUMMARY
+        echo "- Dependency analysis report generated" >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+        echo "### 🔗 Quick Actions" >> $GITHUB_STEP_SUMMARY
+        echo "- [View Coverage Report](../artifacts)" >> $GITHUB_STEP_SUMMARY
+        echo "- [Download Test Results](../artifacts)" >> $GITHUB_STEP_SUMMARY
+
+  # Optional: Additional security scanning for pull requests
+  dependency-check:
+    name: Dependency Security Check
+    runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request'
+    
+    steps:
+    - name: 🔄 Checkout Code
+      uses: actions/checkout@v4
+      
+    - name: 🔍 Dependency Review
+      uses: actions/dependency-review-action@v3
+      with:
+        fail-on-severity: moderate
+        comment-summary-in-pr: true

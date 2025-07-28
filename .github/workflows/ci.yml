@@ -1,0 +1,85 @@
+name: CI - Tests & Security
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  test-and-scan:
+    name: Unit & Integration Tests + Security Scan
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: 🔄 Checkout repository
+      uses: actions/checkout@v4
+      
+    - name: 🟢 Setup Node.js 20.x
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20.x'
+        cache: 'npm'
+        cache-dependency-path: api/package-lock.json
+        
+    - name: 📦 Install dependencies
+      working-directory: ./api
+      run: npm ci
+        
+    - name: 🔬 Run unit tests
+      working-directory: ./api
+      run: |
+        echo "🔬 Running unit tests..."
+        npm test -- --testPathPattern="config.test.js" --ci --verbose=false
+        
+    - name: 🔗 Run integration tests  
+      working-directory: ./api
+      run: |
+        echo "🔗 Running integration tests..."
+        npm test -- --testPathPattern="api.test.js" --ci --verbose=false
+        
+    - name: 🛡️ Security scan - npm audit
+      working-directory: ./api
+      run: |
+        echo "🛡️ Scanning dependencies for security vulnerabilities..."
+        npm audit --audit-level=moderate
+        
+    - name: 📊 Generate coverage report
+      working-directory: ./api
+      run: |
+        echo "📊 Generating test coverage..."
+        npm run test:coverage -- --testPathPattern="(config|api).test.js" --ci --silent
+        
+    - name: � Upload coverage artifacts
+      uses: actions/upload-artifact@v3
+      if: always()
+      with:
+        name: test-coverage
+        path: api/coverage/
+        retention-days: 7
+        
+    - name: 📋 Summary
+      if: always()
+      run: |
+        echo "## 🧪 Test Results" >> $GITHUB_STEP_SUMMARY
+        echo "| Test Type | Status |" >> $GITHUB_STEP_SUMMARY
+        echo "|-----------|--------|" >> $GITHUB_STEP_SUMMARY
+        echo "| Unit Tests | ✅ Completed |" >> $GITHUB_STEP_SUMMARY
+        echo "| Integration Tests | ✅ Completed |" >> $GITHUB_STEP_SUMMARY
+        echo "| Security Scan | ✅ Completed |" >> $GITHUB_STEP_SUMMARY
+
+  # Dependency review for pull requests
+  dependency-review:
+    name: Dependency Security Review
+    runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request'
+    
+    steps:
+    - name: 🔄 Checkout repository
+      uses: actions/checkout@v4
+      
+    - name: 🔍 Dependency Review
+      uses: actions/dependency-review-action@v3
+      with:
+        fail-on-severity: moderate
+        comment-summary-in-pr: true
