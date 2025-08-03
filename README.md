@@ -44,8 +44,8 @@ The demo includes three government service assistants:
 │   Web/Mobile    │    │  Provider        │    │ • Ollama+Phi-3  │
 │                 │    │  Abstraction     │    │ • OpenAI GPT    │
 └─────────────────┘    └──────────────────┘    │ • Anthropic     │
-                                                │ • Azure OpenAI  │
-                                                └─────────────────┘
+                                               │ • Azure OpenAI  │
+                                               └─────────────────┘
 ```
 
 ### 🔄 **Provider Abstraction Layer**
@@ -67,12 +67,12 @@ The application supports multiple LLM providers through a flexible configuration
 
 ### 🎛️ **Supported Providers**
 
-| Provider | Type | Models | Cost | Setup Complexity |
-|----------|------|---------|------|------------------|
-| **Ollama** | Local | Phi-3, Llama2, CodeLlama, etc. | Free | Medium (Docker required) |
-| **OpenAI** | Cloud API | GPT-3.5-turbo, GPT-4, GPT-4-turbo | Paid | Easy (API key only) |
-| **Anthropic** | Cloud API | Claude-3-haiku, Claude-3-sonnet | Paid | Easy (API key only) |
-| **Azure OpenAI** | Cloud API | GPT models via Azure | Paid | Medium (Azure setup) |
+| Provider | Status | Type | Models | Cost | Setup Complexity |
+|----------|--------|------|---------|------|------------------|
+| **Ollama** | ✅ Ready | Local | Phi-3, Llama2, CodeLlama, etc. | Free | Medium (Docker required) |
+| **OpenAI** | ✅ Ready | Cloud API | GPT-3.5-turbo, GPT-4, GPT-4-turbo | Paid | Easy (API key only) |
+| **Anthropic** | 🚧 Planned | Cloud API | Claude-3-haiku, Claude-3-sonnet | Paid | Easy (API key only) |
+| **Azure OpenAI** | 🚧 Planned | Cloud API | GPT models via Azure | Paid | Medium (Azure setup) |
 
 ### 📄 **Configuration File Setup**
 
