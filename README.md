@@ -3,7 +3,7 @@
 [![CI - Tests & Security](https://github.com/mheadd/llm-persistent-instructions/actions/workflows/ci.yml/badge.svg)](https://github.com/mheadd/llm-persistent-instructions/actions/workflows/ci.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-A containerized application demonstrating how to create different AI personas using instruction layering with **multiple LLM providers**. This prototype shows how the same instruction layering approach works seamlessly across local models (Ollama) and cloud APIs (OpenAI, Anthropic, etc.).
+A containerized application demonstrating how to create different AI personas using instruction layering with **multiple LLM providers**. This prototype shows how the same instruction layering approach works seamlessly across local models (Ollama) and cloud APIs (OpenAI, Anthropic, etc.). This is an idea that I first wrote about in [this LinkedIn post](https://www.linkedin.com/pulse/open-source-ai-government-two-paths-better-digital-services-headd-2iine/).
 
 <div align="center">
   <img src="llm-instructions-layering-example.gif" alt="LLM Instructions Layering Demo" style="border: 2px solid #ddd; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.1); max-width: 100%;">
