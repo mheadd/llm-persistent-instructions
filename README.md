@@ -1,12 +1,34 @@
 # Government AI Prototype - Persistent Instruction Layering Demo
 
 [![CI - Tests & Security](https://github.com/mheadd/llm-persistent-instructions/actions/workflows/ci.yml/badge.svg)](https://github.com/mheadd/llm-persistent-instructions/actions/workflows/ci.yml)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 A containerized application demonstrating how to create different AI personas using instruction layering with **multiple LLM providers**. This prototype shows how the same instruction layering approach works seamlessly across local models (Ollama) and cloud APIs (OpenAI, Anthropic, etc.).
 
 <div align="center">
   <img src="llm-instructions-layering-example.gif" alt="LLM Instructions Layering Demo" style="border: 2px solid #ddd; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.1); max-width: 100%;">
 </div>
+
+## 📋 Table of Contents
+
+- [🎯 What This Demonstrates](#-what-this-demonstrates)
+- [🏛️ Government Service Personas](#️-government-service-personas)
+- [🏗️ Architecture](#️-architecture)
+- [🔧 Provider Configuration](#-provider-configuration)
+- [🚀 Quick Start](#-quick-start)
+- [📡 API Endpoints](#-api-endpoints)
+- [🛠️ Technical Stack](#️-technical-stack)
+- [📁 Project Structure](#-project-structure)
+- [🔧 Configuration](#-configuration)
+- [🔍 How Instruction Layering Works](#-how-instruction-layering-works)
+- [🧪 Testing Different Personas](#-testing-different-personas)
+- [✅ Automated Testing](#-automated-testing)
+- [🔄 Development Workflow](#-development-workflow)
+- [🚀 Continuous Integration](#-continuous-integration)
+- [🚨 Troubleshooting](#-troubleshooting)
+- [💡 Use Cases & Applications](#-use-cases--applications)
+- [🤝 Contributing](#-contributing)
+- [📄 License](#-license)
 
 ## 🎯 What This Demonstrates
 
@@ -799,3 +821,15 @@ This is a learning prototype. Feel free to:
 - Experiment with different LLM models
 
 **Note**: This is a prototype for demonstration purposes. For production government services, ensure proper security, accessibility, and compliance with relevant regulations.
+
+## 📄 License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+### 🎯 What this means:
+- ✅ **Free to use** for any purpose (personal, commercial, government)
+- ✅ **Free to modify** and distribute
+- ✅ **No warranty** - use at your own risk
+- ✅ **Attribution required** - just keep the license notice
+
+**MIT License** | Copyright (c) 2025 Government AI Prototype Contributors
