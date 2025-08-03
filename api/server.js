@@ -1,3 +1,6 @@
+// Load environment variables first
+require('dotenv').config();
+
 const express = require('express');
 const cors = require('cors');
 const helmet = require('helmet');
@@ -5,16 +8,72 @@ const morgan = require('morgan');
 const fs = require('fs');
 const path = require('path');
 const yaml = require('js-yaml');
-const axios = require('axios');
+
+// Import LLM provider components
+const ProviderFactory = require('./providers/provider-factory');
+const LLMConfigManager = require('./config/llm-config-manager');
+const EnvironmentConfig = require('./config/environment-config');
 
 const app = express();
-const PORT = process.env.PORT || 3000;
-const OLLAMA_URL = process.env.OLLAMA_URL || 'http://localhost:11434';
+
+// Initialize environment configuration
+const envConfig = new EnvironmentConfig();
+const envValidation = envConfig.printSummary();
+
+// Exit if critical environment errors exist
+if (!envValidation.isValid) {
+  console.error('❌ Critical environment configuration errors detected. Exiting.');
+  process.exit(1);
+}
+
+const config = envConfig.getConfig();
+const PORT = config.port;
+
+// Initialize LLM configuration and provider
+let llmConfigManager;
+let llmProvider;
+
+try {
+  llmConfigManager = new LLMConfigManager();
+  const currentProviderConfig = llmConfigManager.getCurrentProviderConfig();
+  llmProvider = ProviderFactory.createProvider(currentProviderConfig);
+  
+  console.log(`🤖 Initialized LLM provider: ${llmProvider.getProviderName()}`);
+} catch (error) {
+  console.error('❌ Failed to initialize LLM provider:', error.message);
+  
+  // Try fallback providers
+  try {
+    const fallbackConfigs = llmConfigManager?.getFallbackProviders() || [];
+    for (const fallbackConfig of fallbackConfigs) {
+      try {
+        llmProvider = ProviderFactory.createProvider(fallbackConfig);
+        console.log(`🔄 Using fallback provider: ${llmProvider.getProviderName()}`);
+        break;
+      } catch (fallbackError) {
+        console.warn(`Fallback provider ${fallbackConfig.name} also failed: ${fallbackError.message}`);
+      }
+    }
+  } catch (fallbackError) {
+    console.error('All providers failed to initialize');
+  }
+  
+  if (!llmProvider) {
+    console.error('🚨 No LLM provider available! Server will start but chat endpoints will fail.');
+  }
+}
 
 // Middleware
 app.use(helmet());
 app.use(cors());
-app.use(morgan('combined'));
+
+// Configure logging based on environment
+if (config.isDevelopment) {
+  app.use(morgan('dev'));
+} else {
+  app.use(morgan('combined'));
+}
+
 app.use(express.json({ limit: '10mb' }));
 
 // Configuration cache
@@ -70,39 +129,39 @@ function buildPrompt(config, userMessage) {
 }
 
 /**
- * Send request to Ollama service
- * @param {string} prompt - Complete prompt to send
- * @returns {Promise<string>} AI response
+ * Generate response using the configured LLM provider
+ * @param {string} persona - Name of the persona
+ * @param {string} userMessage - User's input message
+ * @returns {Promise<Object>} AI response with metadata
  */
-async function callOllama(prompt) {
+async function generateResponse(persona, userMessage) {
   try {
-    const response = await axios.post(`${OLLAMA_URL}/api/generate`, {
-      model: 'phi3:mini',
-      prompt: prompt,
-      stream: false,
-      options: {
-        temperature: 0.7,
-        top_p: 0.9,
-        max_tokens: 1000
-      }
-    }, {
-      timeout: 120000, // Increased to 120 seconds for model loading
-      headers: {
-        'Content-Type': 'application/json'
-      }
+    if (!llmProvider) {
+      throw new Error('No LLM provider available. Please check configuration.');
+    }
+
+    const config = loadPersonaConfig(persona);
+    const fullPrompt = buildPrompt(config, userMessage);
+
+    console.log(`🤖 Generating response for persona: ${persona} using ${llmProvider.getProviderName()}`);
+
+    const response = await llmProvider.generateResponse(fullPrompt, {
+      temperature: 0.7,
+      maxTokens: 300,
+      topP: 0.9
     });
 
-    if (response.data && response.data.response) {
-      return response.data.response.trim();
-    } else {
-      throw new Error('Invalid response format from Ollama');
-    }
+    return {
+      text: response.text,
+      provider: response.provider,
+      model: response.model,
+      persona: persona,
+      usage: response.usage,
+      metadata: response.metadata
+    };
   } catch (error) {
-    console.error('Ollama API error:', error.message);
-    if (error.code === 'ECONNREFUSED') {
-      throw new Error('Unable to connect to Ollama service. Please ensure it is running.');
-    }
-    throw new Error(`Ollama service error: ${error.message}`);
+    console.error(`❌ Error generating response:`, error.message);
+    throw new Error(`Failed to generate response: ${error.message}`);
   }
 }
 
@@ -122,19 +181,16 @@ function createChatHandler(personaName) {
         });
       }
 
-      // Load persona configuration
-      const config = loadPersonaConfig(personaName);
-      
-      // Build the complete prompt
-      const prompt = buildPrompt(config, message.trim());
-      
-      // Get response from Ollama
-      const aiResponse = await callOllama(prompt);
+      // Generate response using the provider abstraction
+      const aiResponse = await generateResponse(personaName, message.trim());
       
       // Return formatted response
       res.json({
-        response: aiResponse,
+        response: aiResponse.text,
         persona: personaName,
+        provider: aiResponse.provider,
+        model: aiResponse.model,
+        usage: aiResponse.usage,
         timestamp: new Date().toISOString()
       });
 
@@ -161,21 +217,129 @@ app.get('/health', (req, res) => {
   });
 });
 
+// LLM Provider status endpoint
+app.get('/api/provider/status', async (req, res) => {
+  try {
+    if (!llmProvider) {
+      return res.status(503).json({
+        provider: 'none',
+        healthy: false,
+        error: 'No LLM provider initialized',
+        timestamp: new Date().toISOString()
+      });
+    }
+
+    const isHealthy = await llmProvider.healthCheck();
+    const configSummary = llmProvider.getConfigSummary();
+    
+    res.json({
+      provider: llmProvider.getProviderName(),
+      healthy: isHealthy,
+      config: configSummary,
+      timestamp: new Date().toISOString()
+    });
+  } catch (error) {
+    res.status(500).json({
+      provider: llmProvider?.getProviderName() || 'unknown',
+      healthy: false,
+      error: error.message,
+      timestamp: new Date().toISOString()
+    });
+  }
+});
+
+// List all available providers endpoint
+app.get('/api/providers', (req, res) => {
+  try {
+    const currentConfig = llmConfigManager?.getCurrentProviderConfig();
+    const allConfigs = llmConfigManager?.getAllProviderConfigs() || {};
+    const supportedProviders = ProviderFactory.getSupportedProviders();
+    
+    res.json({
+      current: {
+        name: currentConfig?.name || 'none',
+        provider: llmProvider?.getProviderName() || 'none',
+        healthy: llmProvider ? 'unknown' : false
+      },
+      available: Object.keys(allConfigs),
+      supported: supportedProviders,
+      configurations: Object.entries(allConfigs).reduce((acc, [name, config]) => {
+        const { apiKey, api_key, ...safeConfig } = config;
+        acc[name] = {
+          ...safeConfig,
+          hasApiKey: !!(apiKey || api_key || (config.apiKeyEnv && process.env[config.apiKeyEnv]))
+        };
+        return acc;
+      }, {}),
+      timestamp: new Date().toISOString()
+    });
+  } catch (error) {
+    res.status(500).json({
+      error: 'Failed to get provider information',
+      details: error.message,
+      timestamp: new Date().toISOString()
+    });
+  }
+});
+
+// Test a specific provider endpoint
+app.post('/api/provider/test', async (req, res) => {
+  try {
+    const { provider } = req.body;
+    
+    if (!provider) {
+      return res.status(400).json({
+        error: 'Provider name is required',
+        timestamp: new Date().toISOString()
+      });
+    }
+
+    const providerConfig = llmConfigManager?.getProviderConfig(provider);
+    if (!providerConfig) {
+      return res.status(404).json({
+        error: `Provider configuration not found: ${provider}`,
+        timestamp: new Date().toISOString()
+      });
+    }
+
+    const testResult = await ProviderFactory.testProvider(providerConfig);
+    
+    res.json({
+      ...testResult,
+      timestamp: new Date().toISOString()
+    });
+  } catch (error) {
+    res.status(500).json({
+      error: 'Failed to test provider',
+      details: error.message,
+      timestamp: new Date().toISOString()
+    });
+  }
+});
+
 // API information endpoint
 app.get('/api', (req, res) => {
   res.json({
     service: 'Government AI Prototype API',
     version: '1.0.0',
     description: 'Persistent instruction layering demo with specialized government service personas',
+    provider: {
+      current: llmProvider?.getProviderName() || 'none',
+      status: llmProvider ? 'initialized' : 'not available'
+    },
     endpoints: {
       'POST /api/chat/unemployment-benefits': 'Unemployment benefits assistance',
       'POST /api/chat/parks-recreation': 'Parks and recreation information',
       'POST /api/chat/business-licensing': 'Business licensing guidance',
       'POST /api/chat/default': 'General purpose assistant',
       'GET /health': 'Service health check',
-      'GET /api': 'API information'
+      'GET /api': 'API information',
+      'GET /api/provider/status': 'Current provider status',
+      'GET /api/providers': 'List all available providers',
+      'POST /api/provider/test': 'Test a specific provider'
     },
-    personas: ['unemployment-benefits', 'parks-recreation', 'business-licensing', 'default']
+    personas: ['unemployment-benefits', 'parks-recreation', 'business-licensing', 'default'],
+    timestamp: new Date().toISOString()
   });
 });
 
@@ -206,9 +370,18 @@ app.use((error, req, res, next) => {
 // Start server
 app.listen(PORT, '0.0.0.0', () => {
   console.log(`🚀 Government AI API running on port ${PORT}`);
-  console.log(`🔗 Ollama URL: ${OLLAMA_URL}`);
+  
+  if (llmProvider) {
+    console.log(`🤖 LLM Provider: ${llmProvider.getProviderName()}`);
+    console.log(`⚙️  Provider Config: ${JSON.stringify(llmProvider.getConfigSummary(), null, 2)}`);
+  } else {
+    console.log('⚠️  No LLM provider available');
+  }
+  
   console.log(`📁 Config directory: ${path.join(__dirname, 'config')}`);
   console.log(`🏛️ Available personas: unemployment-benefits, parks-recreation, business-licensing, default`);
+  console.log(`📡 Provider status: GET /api/provider/status`);
+  console.log(`📋 All providers: GET /api/providers`);
 });
 
 // Graceful shutdown
