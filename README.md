@@ -4,6 +4,10 @@
 
 A containerized application demonstrating how to create different AI personas using instruction layering with **multiple LLM providers**. This prototype shows how the same instruction layering approach works seamlessly across local models (Ollama) and cloud APIs (OpenAI, Anthropic, etc.).
 
+<div align="center">
+  <img src="llm-instructions-layering-example.gif" alt="LLM Instructions Layering Demo" style="border: 2px solid #ddd; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.1); max-width: 100%;">
+</div>
+
 ## 🎯 What This Demonstrates
 
 This project showcases **persistent instruction layering** - a technique where different system prompts and contexts are dynamically applied to any compatible AI model to create specialized assistants. Instead of training separate models, we use strategic prompt engineering to create distinct AI personas that work consistently across **multiple LLM backends**.
