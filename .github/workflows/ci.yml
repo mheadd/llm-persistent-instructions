@@ -1,4 +1,6 @@
 name: CI - Tests & Security
+permissions:
+  contents: read
 
 # Tests the LLM Provider Abstraction system including:
 # - Provider Factory (Ollama & OpenAI providers)  
