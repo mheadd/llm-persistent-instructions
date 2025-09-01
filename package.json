@@ -1,0 +1,26 @@
+{
+  "name": "llm-persistent-instructions",
+  "version": "1.0.0",
+  "description": "Government AI Prototype with persistent instruction layering and security hardening",
+  "scripts": {
+    "test": "cd api && npm test -- --detectOpenHandles",
+    "test:security": "cd api && npm run test:security -- --detectOpenHandles",
+    "test:watch": "cd api && npm run test:watch -- --detectOpenHandles",
+    "test:coverage": "cd api && npm run test:coverage -- --detectOpenHandles",
+    "security:audit": "cd api && npm run security:audit",
+    "security:full": "cd api && npm run security:full",
+    "start": "cd api && npm start",
+    "dev": "cd api && npm run dev",
+    "install:api": "cd api && npm install"
+  },
+  "keywords": [
+    "ai",
+    "government",
+    "security",
+    "prompt-injection",
+    "llm"
+  ],
+  "author": "Mark Headd",
+  "license": "MIT",
+  "private": true
+}
