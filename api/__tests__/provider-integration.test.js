@@ -4,10 +4,16 @@ const nock = require('nock');
 // This test file focuses on integration testing with local Ollama only
 // It tests the complete flow but uses mocked external services
 
-describe('Provider Integration Tests (Ollama)', () => {
-  let app;
-  
-  beforeAll(() => {
+// Skip entire file if external services not available
+if (process.env.SKIP_EXTERNAL_SERVICE_TESTS === 'true') {
+  describe.skip('Provider Integration Tests (Ollama) - Skipped in CI', () => {
+    test('External service tests skipped', () => {});
+  });
+} else {
+  describe('Provider Integration Tests (Ollama)', () => {
+    let app;
+    
+    beforeAll(() => {
     // Set environment for Ollama testing
     process.env.LLM_PROVIDER = 'ollama';
     process.env.OLLAMA_URL = 'http://localhost:11434';
@@ -222,3 +228,4 @@ describe('Provider Integration Tests (Ollama)', () => {
     });
   });
 });
+}

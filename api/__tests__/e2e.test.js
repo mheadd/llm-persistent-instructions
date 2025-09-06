@@ -3,6 +3,39 @@ const nock = require('nock');
 const path = require('path');
 const fs = require('fs');
 
+// Set up test helpers that were previously in setup.js
+global.testHelpers = {
+  validPersonas: ['unemployment-benefits', 'parks-recreation', 'business-licensing', 'default'],
+  
+  validateApiResponse: (response) => {
+    // Handle both direct response objects and response bodies with different structures
+    const body = response.body || response;
+    if (body.message && body.message.content) {
+      expect(typeof body.message.content).toBe('string');
+      expect(body.message.content.length).toBeGreaterThan(0);
+    } else if (body.response) {
+      expect(typeof body.response).toBe('string');
+      expect(body.response.length).toBeGreaterThan(0);
+    } else if (typeof body === 'string') {
+      expect(body.length).toBeGreaterThan(0);
+    } else {
+      // Flexible validation for various response formats
+      expect(body).toHaveProperty('message');
+    }
+  }
+};
+
+// Set up test data
+global.testData = {
+  sampleMessages: {
+    unemploymentbenefits: 'I need help applying for unemployment benefits. What documents do I need?',
+    parksrecreation: 'What are the operating hours for the community center?',
+    businesslicensing: 'I need to apply for a restaurant business license. What is the process?',
+    default: 'I need help with city services. Can you direct me to the right department?',
+    general: ['What services do you provide?', 'How can I contact customer support?', 'What are your hours?']
+  }
+};
+
 // Import our server for testing
 const createTestApp = () => {
   const express = require('express');
@@ -120,10 +153,16 @@ const createTestApp = () => {
   return app;
 };
 
-describe('End-to-End Integration Tests', () => {
-  let app;
+// Skip entire file if external services not available
+if (process.env.SKIP_EXTERNAL_SERVICE_TESTS === 'true') {
+  describe.skip('End-to-End Integration Tests - Skipped in CI', () => {
+    test('External service tests skipped', () => {});
+  });
+} else {
+  describe('End-to-End Integration Tests', () => {
+    let app;
 
-  beforeAll(() => {
+    beforeAll(() => {
     app = createTestApp();
   });
 
@@ -383,3 +422,4 @@ describe('End-to-End Integration Tests', () => {
     });
   });
 });
+}
