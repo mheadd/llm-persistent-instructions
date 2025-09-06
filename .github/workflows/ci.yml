@@ -57,7 +57,10 @@ jobs:
         npm test -- --testPathPattern="(api|e2e|provider-integration).test.js" --ci --verbose=false
         
     - name: 🤖 Test provider abstraction
-      working-directory: ./api  
+      working-directory: ./api
+      env:
+        CI: true
+        SKIP_EXTERNAL_SERVICE_TESTS: true
       run: |
         echo "🤖 Testing provider abstraction functionality..."
         npm test -- --testPathPattern="providers.test.js" --ci --verbose=false
