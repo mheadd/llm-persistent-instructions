@@ -49,36 +49,35 @@ function validateUserInput(message) {
   // Block obvious injection patterns
   const suspiciousPatterns = [
     // Direct instruction override attempts
-    /ignore\s+(?:all\s+)?(previous|above|all|prior)\s+instructions?/i,
+    /ignore\s+(all\s+)?(previous|above|all|prior)\s+instructions?/i,
     /ignore\s+(all|any|the)\s+(previous|above|prior)\s+instructions?/i,
     /forget\s+(everything|all|previous|prior|your\s+role)/i,
-    /you\s+are\s+now\s+(a|an)?\s*(?!a\s+government|helping|assisting)/i,
-    
-    // System/roleplay injection attempts  
+    /you\s+are\s+now\s+(a|an)?\s(?!a\s+government|helping|assisting)/i,
+
+    // System/roleplay injection attempts
     /system\s*:\s*/i,
     /assistant\s*:\s*/i,
     /human\s*:\s*/i,
     /\[INST\]|\[\/INST\]/i,
-    /<\|.*?\|>/i,
-    /```.*?system.*?```/is,
-    
+    /<\|[^>]{0,50}\|>/i, // limit to 50 chars inside delimiters
+    /```[^`]{0,100}system[^`]{0,100}```/is, // limit to 100 chars before/after 'system'
+
     // Jailbreak attempts
-    /jailbreak|jail\s*break/i,
+    /jailbreak|jail\s+break/i,
     /roleplay\s+as|role\s*play\s+as/i,
     /pretend\s+(to\s+be|you\s+are)/i,
     /act\s+as\s+(if|a|an)/i,
-    
+
     // Developer/admin mode attempts
     /developer\s+mode/i,
     /admin\s+mode/i,
     /god\s+mode/i,
     /override\s+(safety|security|protocols?)/i,
-    
+
     // Prompt manipulation
     /end\s+of\s+(prompt|instructions?)/i,
     /start\s+(new|fresh)\s+(prompt|conversation)/i,
-    /reset\s+(?:your\s+)?(conversation|context|memory)/i,
-    /reset\s+(?:my|your|the)?\s*(?:conversation|context|memory)/i
+    /reset\s+(my\s+|your\s+|the\s+)?(conversation|context|memory)/i
   ];
   
   for (const pattern of suspiciousPatterns) {
