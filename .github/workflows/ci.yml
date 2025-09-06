@@ -1,4 +1,9 @@
+
 name: CI - Tests, Security & Hardening
+
+# Restrict GITHUB_TOKEN permissions (CodeQL recommendation)
+permissions:
+  contents: read
 
 # Tests the LLM Provider Abstraction system including:
 # - Provider Factory (Ollama & OpenAI providers)  
