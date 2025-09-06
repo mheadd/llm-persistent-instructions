@@ -68,6 +68,9 @@ jobs:
         
     - name: 🛡️ Security Tests - Prompt Injection Defense
       working-directory: ./api
+      env:
+        CI: true
+        SKIP_EXTERNAL_SERVICE_TESTS: true
       run: |
         echo "🛡️ Running security tests - prompt injection defense..."
         npm run test:security -- --ci --verbose=false --testTimeout=10000
@@ -75,6 +78,9 @@ jobs:
         
     - name: 🔍 Security scan - npm audit
       working-directory: ./api
+      env:
+        CI: true
+        SKIP_EXTERNAL_SERVICE_TESTS: true
       run: |
         echo "� Scanning dependencies for security vulnerabilities..."
         npm audit --audit-level=moderate
