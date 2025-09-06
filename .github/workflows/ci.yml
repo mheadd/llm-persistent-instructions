@@ -49,6 +49,9 @@ jobs:
         
     - name: 🔗 Run integration tests  
       working-directory: ./api
+      env:
+        CI: true
+        SKIP_EXTERNAL_SERVICE_TESTS: true
       run: |
         echo "🔗 Running integration tests..."
         npm test -- --testPathPattern="(api|e2e|provider-integration).test.js" --ci --verbose=false
@@ -75,12 +78,18 @@ jobs:
         
     - name: 🚨 Performance Tests
       working-directory: ./api
+      env:
+        CI: true
+        SKIP_EXTERNAL_SERVICE_TESTS: true
       run: |
         echo "🚨 Running performance tests..."
         npm test -- --testPathPattern="performance.test.js" --ci --verbose=false
         
     - name: 📊 Generate coverage report
       working-directory: ./api
+      env:
+        CI: true
+        SKIP_EXTERNAL_SERVICE_TESTS: true
       run: |
         echo "📊 Generating test coverage..."
         npm run test:coverage -- --testPathPattern="(config|api|providers|environment-config|provider-integration|security).test.js" --ci --silent
