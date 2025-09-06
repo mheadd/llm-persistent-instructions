@@ -161,6 +161,9 @@ jobs:
         
     - name: 🛡️ Full security test suite
       working-directory: ./api
+      env:
+        CI: true
+        SKIP_EXTERNAL_SERVICE_TESTS: true
       run: |
         echo "🛡️ Running comprehensive security test suite..."
         npm run security:full
