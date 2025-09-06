@@ -120,16 +120,16 @@ const createTestApp = () => {
   return app;
 };
 
-describe('API Integration Tests', () => {
-  let app;
+// Skip entire file if external services not available
+if (process.env.SKIP_EXTERNAL_SERVICE_TESTS === 'true') {
+  describe.skip('API Integration Tests - Skipped in CI', () => {
+    test('External service tests skipped', () => {});
+  });
+} else {
+  describe('API Integration Tests', () => {
+    let app;
 
-  // Skip tests requiring external services in CI
-  if (process.env.SKIP_EXTERNAL_SERVICE_TESTS === 'true') {
-    test.skip('Skipping API integration tests - external services not available in CI', () => {});
-    return;
-  }
-
-  beforeAll(() => {
+    beforeAll(() => {
     app = createTestApp();
   });
 
@@ -292,3 +292,4 @@ describe('API Integration Tests', () => {
     });
   });
 });
+}

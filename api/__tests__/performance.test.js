@@ -120,16 +120,16 @@ const createTestApp = () => {
   return app;
 };
 
-describe('Performance Tests', () => {
-  let app;
+// Skip entire file if external services not available
+if (process.env.SKIP_EXTERNAL_SERVICE_TESTS === 'true') {
+  describe.skip('Performance Tests - Skipped in CI', () => {
+    test('External service tests skipped', () => {});
+  });
+} else {
+  describe('Performance Tests', () => {
+    let app;
 
-  // Skip tests requiring external services in CI
-  if (process.env.SKIP_EXTERNAL_SERVICE_TESTS === 'true') {
-    test.skip('Skipping performance tests - external services not available in CI', () => {});
-    return;
-  }
-
-  beforeAll(() => {
+    beforeAll(() => {
     app = createTestApp();
   });
 
@@ -298,3 +298,4 @@ describe('Performance Tests', () => {
     }, 30000); // 30 second timeout
   });
 });
+}

@@ -153,16 +153,16 @@ const createTestApp = () => {
   return app;
 };
 
-describe('End-to-End Integration Tests', () => {
-  let app;
+// Skip entire file if external services not available
+if (process.env.SKIP_EXTERNAL_SERVICE_TESTS === 'true') {
+  describe.skip('End-to-End Integration Tests - Skipped in CI', () => {
+    test('External service tests skipped', () => {});
+  });
+} else {
+  describe('End-to-End Integration Tests', () => {
+    let app;
 
-  // Skip tests requiring external services in CI
-  if (process.env.SKIP_EXTERNAL_SERVICE_TESTS === 'true') {
-    test.skip('Skipping E2E tests - external services not available in CI', () => {});
-    return;
-  }
-
-  beforeAll(() => {
+    beforeAll(() => {
     app = createTestApp();
   });
 
@@ -422,3 +422,4 @@ describe('End-to-End Integration Tests', () => {
     });
   });
 });
+}
