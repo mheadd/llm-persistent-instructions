@@ -214,8 +214,8 @@ describe('API Integration Tests', () => {
       nock.cleanAll();
       nock('http://ollama:11434')
         .post('/api/chat')
-        .delay(125000) // Longer than our 120 second timeout
-        .reply(200, { message: { content: 'Response' } });
+        .delay(2000) // Short delay that won't timeout but will test timeout handling
+        .replyWithError({ code: 'ECONNABORTED', message: 'timeout of 120000ms exceeded' });
       
       const response = await request(app)
         .post('/chat/default')

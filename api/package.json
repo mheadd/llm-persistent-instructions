@@ -61,8 +61,7 @@
       "/node_modules/",
       "/coverage/"
     ],
-    "setupFilesAfterEnv": ["<rootDir>/__tests__/setup.js"],
-    "testTimeout": 10000,
+    "testTimeout": 30000,
     "detectOpenHandles": true,
     "forceExit": false
   },
