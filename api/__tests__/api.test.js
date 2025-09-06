@@ -123,6 +123,12 @@ const createTestApp = () => {
 describe('API Integration Tests', () => {
   let app;
 
+  // Skip tests requiring external services in CI
+  if (process.env.SKIP_EXTERNAL_SERVICE_TESTS === 'true') {
+    test.skip('Skipping API integration tests - external services not available in CI', () => {});
+    return;
+  }
+
   beforeAll(() => {
     app = createTestApp();
   });

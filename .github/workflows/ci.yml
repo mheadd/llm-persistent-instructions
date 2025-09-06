@@ -39,11 +39,13 @@ jobs:
       working-directory: ./api
       run: npm ci
         
-    - name: 🔬 Run unit tests
+    - name: Run tests
       working-directory: ./api
+      env:
+        CI: true
+        SKIP_EXTERNAL_SERVICE_TESTS: true
       run: |
-        echo "🔬 Running unit tests..."
-        npm test -- --testPathPattern="(config|providers|environment-config).test.js" --ci --verbose=false
+        npm test
         
     - name: 🔗 Run integration tests  
       working-directory: ./api

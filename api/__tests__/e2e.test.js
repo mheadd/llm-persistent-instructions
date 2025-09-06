@@ -156,6 +156,12 @@ const createTestApp = () => {
 describe('End-to-End Integration Tests', () => {
   let app;
 
+  // Skip tests requiring external services in CI
+  if (process.env.SKIP_EXTERNAL_SERVICE_TESTS === 'true') {
+    test.skip('Skipping E2E tests - external services not available in CI', () => {});
+    return;
+  }
+
   beforeAll(() => {
     app = createTestApp();
   });

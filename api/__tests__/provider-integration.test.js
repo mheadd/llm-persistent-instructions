@@ -6,6 +6,12 @@ const nock = require('nock');
 
 describe('Provider Integration Tests (Ollama)', () => {
   let app;
+
+  // Skip tests requiring external services in CI
+  if (process.env.SKIP_EXTERNAL_SERVICE_TESTS === 'true') {
+    test.skip('Skipping provider integration tests - external services not available in CI', () => {});
+    return;
+  }
   
   beforeAll(() => {
     // Set environment for Ollama testing
