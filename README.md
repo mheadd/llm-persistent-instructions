@@ -11,24 +11,24 @@ A containerized application demonstrating how to create different AI personas us
 
 ## 📋 Table of Contents
 
-- [🎯 What This Demonstrates](#-what-this-demonstrates)
-- [🏛️ Government Service Personas](#️-government-service-personas)
-- [🏗️ Architecture](#️-architecture)
-- [🔧 Provider Configuration](#-provider-configuration)
-- [🚀 Quick Start](#-quick-start)
-- [📡 API Endpoints](#-api-endpoints)
-- [🛠️ Technical Stack](#️-technical-stack)
-- [📁 Project Structure](#-project-structure)
-- [🔧 Configuration](#-configuration)
-- [🔍 How Instruction Layering Works](#-how-instruction-layering-works)
-- [🧪 Testing Different Personas](#-testing-different-personas)
-- [✅ Automated Testing](#-automated-testing)
-- [🔄 Development Workflow](#-development-workflow)
-- [🚀 Continuous Integration](#-continuous-integration)
-- [🚨 Troubleshooting](#-troubleshooting)
-- [💡 Use Cases & Applications](#-use-cases--applications)
-- [🤝 Contributing](#-contributing)
-- [📄 License](#-license)
+- [What This Demonstrates](#-what-this-demonstrates)
+- [Government Service Personas](#️-government-service-personas)
+- [Architecture](#️-architecture)
+- [Provider Configuration](#-provider-configuration)
+- [Quick Start](#-quick-start)
+- [API Endpoints](#-api-endpoints)
+- [Technical Stack](#️-technical-stack)
+- [Project Structure](#-project-structure)
+- [Configuration](#-configuration)
+- [How Instruction Layering Works](#-how-instruction-layering-works)
+- [Testing Different Personas](#-testing-different-personas)
+- [Automated Testing](#-automated-testing)
+- [Development Workflow](#-development-workflow)
+- [Continuous Integration](#-continuous-integration)
+- [Troubleshooting](#-troubleshooting)
+- [Use Cases & Applications](#-use-cases--applications)
+- [Contributing](#-contributing)
+- [License](#-license)
 
 ## 🎯 What This Demonstrates
 
@@ -60,6 +60,8 @@ The demo includes three government service assistants:
    - Permit requirements and application processes
    - Regulatory compliance guidance
    - Fee structures and renewal procedures
+
+For more information on personas, and instructions on how to add new ones - see the [PERSONAS-GUIDE.md](PERSONAS-GUIDE.md)
 
 ## 🏗️ Architecture
 
